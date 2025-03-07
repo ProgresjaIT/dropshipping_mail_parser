@@ -1,0 +1,73 @@
+# Struktura bazy danych dla systemu zamówień
+
+## 1. Kontrahenci i ich produkty
+
+### Tabela `kontrahenci`:
+- ID_Kontrahent - unikalny identyfikator kontrahenta
+- ID_RAKS - identyfikator z systemu RAKS
+- Nazwa - nazwa firmy
+- Email - adres email kontaktu w firmie
+- Skrot_Raks - skrócona nazwa używana w systemie RAKS
+- Formaty_Plikow - akceptowane formaty plików
+- ID_User - identyfikator użytkownika przypisanego do kontrahenta
+
+### Tabela `kontrahenci_indeksy` (mapowanie produktów):
+- ID_Indeks - unikalny identyfikator wpisu
+- ID_Kontrahent - powiązanie z tabelą kontrahenci
+- Indeks_Progresja - indeks produktu w systemie Progresja
+- Indeks_Kontrahent - indeks produktu używany przez kontrahenta
+- Dlugosc, Wysokosc, Cena - parametry produktu
+
+## 2. System zamówień
+
+### Tabela `historia_zamowien`:
+- ID_Zamowienia - unikalny identyfikator zamówienia
+- ID_Kontrahent - powiązanie z kontrahentem
+- ID_Wia domosc -powiązanie z wiadomością email
+- NR_Zamowienia - numer zamówienia
+- Skrzynka_Email - adres email, z którego przyszło zamówienie
+- Cena_Zamowienia - całkowita wartość zamówienia
+- Plik - załączony plik z zamówieniem
+- Data_Wyslania - data wysłania zamówienia
+- Inne informacje: NIP, uwagi, termin płatności
+
+### Tabela `historia_pozycje`:
+- ID_Zamowienia - powiązanie z zamówieniem
+- Index_Obcy - kod produktu kontrahenta
+- Index_Raks - kod produktu w systemie RAKS
+- Dlugosc, Wysokosc - wymiary
+- Ilosc - zamówiona ilość
+- Cena_Pozycji - cena pozycji
+- Usluga_Transportowa - informacje o transporcie
+
+### Tabela `historia_wysylka`:
+- ID_Zamowienia - powiązanie z zamówieniem
+- Dane adresowe: 
+  - Firma
+  - Osoba
+  - Telefon
+  - Ulica
+  - Nr_Domu
+  - Nr_Lokalu
+  - Kod_Pocztowy
+  - Miejscowosc
+  - Kraj
+  - EU_CODE (kod kraju UE)
+
+## Proces zapisywania zamówienia z maila:
+
+1. Utworzenie nowego zamówienia w `historia_zamowien`
+2. Dla każdej pozycji z zamówienia zapis do `historia_pozycje`
+3. Zapisanie danych adresowych do `historia_wysylka`
+
+## Mapowanie kodów produktów:
+1. Z maila otrzymujemy kod produktu kontrahenta
+2. Sprawdzamy w tabeli `kontrahenci_indeksy` mapowanie na nasz kod wewnętrzny
+3. Używamy znalezionych informacji (wymiary, ceny) do utworzenia pozycji zamówienia
+
+## Możliwości systemu:
+- Przechowywanie pełnej historii zamówień
+- Mapowanie kodów produktów między systemami
+- Śledzenie cen i wymiarów produktów
+- Przechowywanie danych adresowych do wysyłki
+- Powiązanie zamówień z wiadomościami email i kontrahentami
